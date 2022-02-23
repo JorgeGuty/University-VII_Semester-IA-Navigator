@@ -1,4 +1,4 @@
-__authors__='TO_BE_FILLED'
+__authors__='Jorge Gutiérrez Cordero'
 __group__='TO_BE_FILLED'
 # _________________________________________________________________________________________
 # Intel.ligencia Artificial

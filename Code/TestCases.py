@@ -5,7 +5,6 @@ from utils import *
 import os
 import random
 
-
 class TestCases(unittest.TestCase):
     ROOT_FOLDER = '../CityInformation/Lyon_smallCity/'
 
@@ -13,7 +12,7 @@ class TestCases(unittest.TestCase):
         map = read_station_information(os.path.join(self.ROOT_FOLDER, 'Stations.txt'))
         connections = read_cost_table(os.path.join(self.ROOT_FOLDER, 'Time.txt'))
         map.add_connection(connections)
-
+        print(map.stations)
         infoVelocity_clean = read_information(os.path.join(self.ROOT_FOLDER, 'InfoVelocity.txt'))
         map.add_velocity(infoVelocity_clean)
 

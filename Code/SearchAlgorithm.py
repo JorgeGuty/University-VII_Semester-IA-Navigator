@@ -16,6 +16,12 @@ import math
 import copy
 
 
+''''
+PREGUNTAS:
+en el documento se usa como head de la ruta el último de cada path, pero en la teoria el primero
+coord2station dice index, no es id?
+'''
+
 def expand(path, map):
     """
      It expands a SINGLE station and returns the list of class Path.
@@ -27,7 +33,18 @@ def expand(path, map):
             path_list (list): List of paths that are connected to the given path.
     """
 
-    pass
+    expanded_path = []
+    head_of_path = path.last
+
+    connections = map.connections.get(head_of_path)
+
+    for stationId in connections.keys():
+
+        new_path = Path(list(path.route))
+        new_path.add_route(stationId)
+        expanded_path.append(new_path)
+
+    return expanded_path
 
 
 def remove_cycles(path_list):
@@ -39,7 +56,13 @@ def remove_cycles(path_list):
         Returns:
             path_list (list): Expanded paths without cycles.
     """
-    pass
+    cycles_removed_path_list = []
+
+    for path in path_list:
+        if len(path.route) == len(set(path.route)):
+            cycles_removed_path_list.append(path)
+
+    return cycles_removed_path_list
 
 
 def insert_depth_first_search(expand_paths, list_of_path):
@@ -51,8 +74,9 @@ def insert_depth_first_search(expand_paths, list_of_path):
             list_of_path (LIST of Path Class): The paths to be visited
         Returns:
             list_of_path (LIST of Path Class): List of Paths where Expanded Path is inserted
+
     """
-    pass
+    return expand_paths + list_of_path[1:]
 
 
 def depth_first_search(origin_id, destination_id, map):
@@ -66,7 +90,20 @@ def depth_first_search(origin_id, destination_id, map):
         Returns:
             list_of_path[0] (Path Class): the route that goes from origin_id to destination_id
     """
-    pass
+
+    paths = [Path(origin_id)]
+
+    while paths != [] and paths[0].last != destination_id:
+
+        head = paths[0]
+        expanded_head = expand(head, map)
+        cycle_free_expanded_head = remove_cycles(expanded_head)
+        paths = insert_depth_first_search(cycle_free_expanded_head, paths)
+
+    if len(paths) > 0:
+        return paths[0]
+    else:
+        return []
 
 
 def insert_breadth_first_search(expand_paths, list_of_path):
@@ -79,7 +116,8 @@ def insert_breadth_first_search(expand_paths, list_of_path):
            Returns:
                list_of_path (LIST of Path Class): List of Paths where Expanded Path is inserted
     """
-    pass
+
+    return list_of_path[1:] + expand_paths
 
 
 def breadth_first_search(origin_id, destination_id, map):
@@ -93,6 +131,20 @@ def breadth_first_search(origin_id, destination_id, map):
         Returns:
             list_of_path[0] (Path Class): The route that goes from origin_id to destination_id
     """
+
+    paths = [Path(origin_id)]
+
+    while paths != [] and paths[0].last != destination_id:
+        head = paths[0]
+        expanded_head = expand(head, map)
+        cycle_free_expanded_head = remove_cycles(expanded_head)
+        paths = insert_breadth_first_search(cycle_free_expanded_head, paths)
+
+    if len(paths) > 0:
+        return paths[0]
+    else:
+        return []
+
     pass
 
 
@@ -211,9 +263,25 @@ def coord2station(coord, map):
             coord (list):  Two REAL values, which refer to the coordinates of a point in the city.
             map (object of Map class): All the map information
         Returns:
-            possible_origins (list): List of the Indexes of stations, which corresponds to the closest station
+            possible_origins (list): List of the Indexes ***?*** of stations, which corresponds to the closest station
     """
-    pass
+
+    stations = map.stations.items()
+    current_minimum_distance = INF
+    minimum_distance_stations = []
+
+    for stationId, stationInfo in stations:
+
+        distance_to_station = euclidean_dist(coord, [stationInfo.get("x"), stationInfo.get("y")])
+
+        if distance_to_station < current_minimum_distance:
+            current_minimum_distance = distance_to_station
+            minimum_distance_stations = [stationId]
+
+        elif distance_to_station == current_minimum_distance:
+            minimum_distance_stations += [stationId]
+
+    return minimum_distance_stations
 
 
 def Astar(origin_coor, dest_coor, map, type_preference=0):
